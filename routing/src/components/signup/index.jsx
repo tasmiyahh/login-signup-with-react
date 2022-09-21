@@ -12,13 +12,14 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import axios from 'axios'
 
 function Copyright(props) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
       {'Copyright © '}
       <Link color="inherit" href="https://mui.com/">
-        Your Website
+        kidswish
       </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
@@ -28,16 +29,38 @@ function Copyright(props) {
 
 const theme = createTheme();
 
-export default function SignUp() {
+export default function Signup() {
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     console.log({
       email: data.get('email'),
       password: data.get('password'),
+      firstName : data.get('firstName'),
+      lastName : data.get('lastName'),
+      agree : data.get('agree')
     });
-  };
 
+    let baseUrl = "http://localhost:5000";
+    axios.post(`${baseUrl}/signup`, {
+      email : data.get('email'),
+      password : data.get('password'),
+      firstName : data.get('firstName'),
+      lastName : data.get('lastName')
+      
+     })
+     .then(function (response) {
+       console.log("response:" ,response.data.message);
+       alert(response.data.message);
+       
+       
+     })
+     .catch(function (error) {
+       console.log("error in api call" , error);
+       alert(error.response.data.message)
+     });
+
+  };
   return (
     <ThemeProvider theme={theme}>
       <Container component="main" maxWidth="xs">
@@ -100,9 +123,22 @@ export default function SignUp() {
                   autoComplete="new-password"
                 />
               </Grid>
+
+              <Grid item xs={12}>
+                <TextField
+                  required
+                  fullWidth
+                  name="address"
+                  label="address"
+                  type="text"
+                  id="address"
+                  
+                />
+              </Grid>
+              
               <Grid item xs={12}>
                 <FormControlLabel
-                  control={<Checkbox value="allowExtraEmails" color="primary" />}
+                  control={<Checkbox name='agree' value="allowExtraEmails" color="primary" />}
                   label="I want to receive inspiration, marketing promotions and updates via email."
                 />
               </Grid>

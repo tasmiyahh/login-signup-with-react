@@ -122,37 +122,45 @@ app.post("/login", (req, res) => {
     }
 
     // check if user already exist // query email user
-    userModel.findOne({ email: body.email }, (err, data) => {
-        if (!err) {
-            console.log("data: ", data);
+    userModel.findOne({ email: body.email },
+        //projection
+        { email: 1, firstName: 1, lastName: 1, age: 1, password: 0 },
+      // "email firstName lastName password age" ,
+        (err, data) => {
+            if (!err) {
+                console.log("data: ", data);
 
-            if (data) { // user found
-                varifyHash(body.password, data.password).then(isMatched => {
+                if (data) { // user found
+                    varifyHash(body.password, data.password).then(isMatched => {
 
-                    console.log("isMatched: ", isMatched);
+                        console.log("isMatched: ", isMatched);
 
-                    if (isMatched) {
-                        // TODO:  add JWT token
-                        res.send({ message: "login successful" });
-                        return;
-                    } else {
-                        console.log("user not found");
-                        res.status(401).send({ message: "Incorrect email or password" });
-                        return;
-                    }
-                })
+                        if (isMatched) {
+                            // TODO:  add JWT token
+                            res.send({
+                                message: "login successful",
+                                profile: { email: data.email, firstName: data.firstName, lastName: data.lastName, age: data.age },
 
-            } else { // user not already exist
-                console.log("user not found");
-                res.status(401).send({ message: "Incorrect email or password" });
+                            });
+                            return;
+                        } else {
+                            console.log("user not found");
+                            res.status(401).send({ message: "Incorrect email or password" });
+                            return;
+                        }
+                    })
+
+                } else { // user not already exist
+                    console.log("user not found");
+                    res.status(401).send({ message: "Incorrect email or password" });
+                    return;
+                }
+            } else {
+                console.log("db error: ", err);
+                res.status(500).send({ message: "login failed, please try later" });
                 return;
             }
-        } else {
-            console.log("db error: ", err);
-            res.status(500).send({ message: "login failed, please try later" });
-            return;
-        }
-    })
+        })
 
 
 
@@ -173,7 +181,7 @@ app.listen(port, () => {
 
 
 ////////////////mongodb connected disconnected events///////////////////////////////////////////////
-let dbURI='mongodb+srv://tasmiyah:web@cluster0.cj82tmo.mongodb.net/reactlogin?retryWrites=true&w=majority'
+let dbURI = 'mongodb+srv://tasmiyah:web@cluster0.cj82tmo.mongodb.net/reactlogin?retryWrites=true&w=majority'
 mongoose.connect(dbURI);
 
 ////////////////mongodb connected disconnected events///////////////////////////////////////////////

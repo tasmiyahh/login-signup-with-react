@@ -88,16 +88,6 @@ app.post("/signup", (req, res) => {
 });
 
 
-app.get("/users", async (req, res) => {
-
-    try {
-        let allUser = await userModel.find({}).exec();
-        res.send(allUser);
-
-    } catch (error) {
-        res.status(500).send({ message: "error getting users" });
-    }
-})
 
 
 
@@ -124,8 +114,8 @@ app.post("/login", (req, res) => {
     // check if user already exist // query email user
     userModel.findOne({ email: body.email },
         //projection
-        { email: 1, firstName: 1, lastName: 1, age: 1, password: 0 },
-      // "email firstName lastName password age" ,
+      //  { email: 1, firstName: 1, lastName: 1, age: 1, password: 0 },
+      "email firstName lastName password age" ,
         (err, data) => {
             if (!err) {
                 console.log("data: ", data);
@@ -139,10 +129,11 @@ app.post("/login", (req, res) => {
                             // TODO:  add JWT token
                             res.send({
                                 message: "login successful",
-                                profile: { email: data.email, firstName: data.firstName, lastName: data.lastName, age: data.age },
+                                profile: { email: data.email, firstName: data.firstName, lastName: data.lastName, age: data.age , _id : data._id},
 
                             });
                             return;
+                            
                         } else {
                             console.log("user not found");
                             res.status(401).send({ message: "Incorrect email or password" });
